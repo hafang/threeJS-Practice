@@ -36162,28 +36162,26 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-// Set up the scene, camera, and renderer as global variables.
-var scene, camera, renderer; // Sets up the scene.
+// Set up global variables.
+var scene, camera, renderer;
+var width = window.innerWidth;
+var height = window.innerHeight; // Sets up the scene.
 
 function init() {
   // Create the scene and set the scene size.
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff); //scene.background = new THREE.Color(0x8fbcd4);
+  scene = new THREE.Scene(); //scene.background = new THREE.Color(0xffffff);
 
-  camera = new THREE.PerspectiveCamera( // Field of view: bigger  = wide lens
-  45, // Camera?/Pixel? Aspect ratio
-  window.innerWidth / window.innerHeight, // Near & far-clipping planes
-  // Ensures good level of detail for web browsers
-  0.1, 1000);
-  camera.position.set(0, -30, 30); // Create a renderer and add it to the DOM.
+  var fov = 45;
+  var nearClip = 0.01;
+  var farClip = 1000;
+  camera = new THREE.PerspectiveCamera(fov, width / height, nearClip, farClip);
+  camera.position.z = 1.5; // Create a renderer and add it to the DOM.
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(width, height);
   document.body.appendChild(renderer.domElement); // Create an event listener that resizes the renderer with the browser window.
 
   window.addEventListener("resize", function () {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
     renderer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
@@ -36197,47 +36195,65 @@ function createControls() {
 
 
 function createLight() {
-  var color = 0xffffff;
-  var intensity = 0.75;
-  var dLight = new THREE.DirectionalLight(color, intensity);
-  dLight.position.set(0, 10, 5);
-  dLight.target.position.set(-5, 0, 0);
-  scene.add(dLight);
-  scene.add(dLight.target);
-  var intensityHem = 0.55;
-  var skyColor = 0xb1e1ff;
-  var groundColor = 0xb97a20;
-  var hemLight = new THREE.HemisphereLight(skyColor, groundColor, intensityHem);
-  scene.add(dLight);
-  scene.add(hemLight);
+  scene.add(new THREE.AmbientLight(0x333333));
+  var dLight2 = new THREE.DirectionalLight(0xffffff, 1);
+  dLight2.position.set(5, 3, 5);
+  scene.add(dLight2);
 }
 
-function createGround() {
-  // const loader = new THREE.TextureLoader();
-  // const texture = loader.load("jotunheimen_tex.jpg");
-  var terrainLoader = new THREE.TerrainLoader();
-  terrainLoader.load("textures/jotunheimen.bin", function (data) {
-    var ground = new THREE.PlaneGeometry(60, 60, 199, 199);
-
-    for (var i = 0, l = ground.vertices.length; i < l; i++) {
-      ground.vertices[i].z = data[i] / 65535 * 5;
-    }
-
-    scene.add(new THREE.AmbientLight(0xeeeeee));
-    var groundMat = new THREE.MeshPhongMaterial({
-      map: THREE.ImageUtils.loadTexture("textures/jotunheimen_tex.jpg"),
-      //color: 0x000000,
-      wireframe: false
-    });
-    var plane = new THREE.Mesh(ground, groundMat);
-    scene.add(plane);
+function createSpace() {
+  var starfield_tex = new THREE.TextureLoader().load("textures/galaxy_starfield.png");
+  var galaxySphere = new THREE.SphereGeometry(90, 64, 64);
+  var galaxyMat = new THREE.MeshBasicMaterial({
+    map: starfield_tex,
+    side: THREE.BackSide
   });
+  var galaxy = new THREE.Mesh(galaxySphere, galaxyMat);
+  scene.add(galaxy);
+}
+
+function createEarth() {
+  // Earth
+  var earth_noClouds = new THREE.TextureLoader().load("textures/earth_noClouds_4k.jpg");
+  var earthSphere = new THREE.SphereGeometry(0.25, 32, 32);
+  var earthMat = new THREE.MeshPhongMaterial({
+    map: earth_noClouds,
+    bumpMap: earth_noClouds,
+    bumpScale: 0.0015
+  });
+  var earth = new THREE.Mesh(earthSphere, earthMat);
+  scene.add(earth); // Add clouds to earth
+
+  var cloud_tex = new THREE.TextureLoader().load("textures/earth_clouds_4k.png");
+  var cloudSphere = new THREE.SphereGeometry(0.2503, 32, 32);
+  var cloudMat = new THREE.MeshPhongMaterial({
+    map: cloud_tex,
+    transparent: true
+  });
+  var clouds = new THREE.Mesh(cloudSphere, cloudMat);
+  scene.add(clouds);
+}
+
+function createMoon() {
+  var moon_tex = new THREE.TextureLoader().load("textures/moon_tex.jpg");
+  var moonSphere = new THREE.SphereGeometry(0.075, 32, 32);
+  var moonMat = new THREE.MeshPhongMaterial({
+    map: moon_tex,
+    bumpMap: moon_tex,
+    bumpScale: 0.005
+  });
+  var moon = new THREE.Mesh(moonSphere, moonMat);
+  moon.position.set(0.5, 0, 0.5);
+  scene.add(moon);
 }
 
 function main() {
   init();
-  createControls();
-  createGround();
+  createControls(); //createGround();
+
+  createSpace();
+  createEarth();
+  createMoon();
 
   function resizeRendererToDisplaySize(renderer) {
     var canvas = renderer.domElement;
@@ -36253,8 +36269,6 @@ function main() {
   }
 
   function render(time) {
-    time *= 0.001; // convert to seconds
-
     resizeRendererToDisplaySize(renderer);
     renderer.render(scene, camera);
     requestAnimationFrame(render);
@@ -36264,6 +36278,7 @@ function main() {
 }
 
 main();
+createLight();
 },{"three":"node_modules/three/build/three.module.js","./TerrainLoader":"src/TerrainLoader.js","three/examples/jsm/controls/OrbitControls":"node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
