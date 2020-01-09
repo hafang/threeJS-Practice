@@ -1,153 +1,124 @@
 import * as THREE from "three";
+import TerrainLoader from "./TerrainLoader";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-// User Input
-// ==========
+// Set up the scene, camera, and renderer as global variables.
+var scene, camera, renderer;
 
-var mouse = {
-  x: 0,
-  y: 0
-};
+// Sets up the scene.
+function init() {
+  // Create the scene and set the scene size.
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+  //scene.background = new THREE.Color(0x8fbcd4);
+  camera = new THREE.PerspectiveCamera(
+    // Field of view: bigger  = wide lens
+    45,
+    // Camera?/Pixel? Aspect ratio
+    window.innerWidth / window.innerHeight,
+    // Near & far-clipping planes
+    // Ensures good level of detail for web browsers
+    0.1,
+    1000
+  );
 
-// Scene & Camera
-// ===============
+  camera.position.set(0, -30, 30);
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(
-  // Field of view: bigger = wide lens
-  75,
-  // Camera?/Pixel? Aspect ratio
-  window.innerWidth / window.innerHeight,
-  // Near & far-clipping planes
-  // Ensures good level of detail for web browsers
-  0.1,
-  1000
-);
-camera.position.z = 5;
+  // Create a renderer and add it to the DOM.
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-// Renderer
-// ========
-
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Update Viewport on Resize
-window.addEventListener("resize", function() {
-  var width = window.innerWidth;
-  var height = window.innerHeight;
-  renderer.setSize(width, height);
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-});
-
-// Utilities
-// =========
-
-function addCube(material) {
-  let geometry = new THREE.BoxGeometry(1, 1, 1);
-  let cube = new THREE.Mesh(geometry, material);
-
-  scene.add(cube);
-
-  return cube;
+  // Create an event listener that resizes the renderer with the browser window.
+  window.addEventListener("resize", function() {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  });
 }
 
-// Textures
-// ========
-
-var texture = new THREE.TextureLoader().load("textures/corgi.jpg");
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-
-// Tiling Settings
-texture.repeat.set(1, 1);
-
-// Materials
-// =========
-
-var basicMaterial = new THREE.MeshBasicMaterial({
-  map: texture
-});
-
-var standardMaterial = new THREE.MeshStandardMaterial({
-  map: texture
-});
-
-// Objects
-// ========
-
-var pointerCube = addCube(basicMaterial);
-var centerCube = addCube(standardMaterial);
-
-// Initialize Object positions
-// ---------------------------
-
-centerCube.position.x = 2.0;
-
-// Lights
-// ======
-
-// White directional light at half intensity shining from the top.
-var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-scene.add(directionalLight);
-
-let pointLight = new THREE.PointLight(new THREE.Color("red"), 0.5);
-scene.add(pointLight);
-pointLight.position.set(0.0, 0.0, 5.0);
-
-// When the mouse moves, call the given function
-document.addEventListener("mousemove", onMouseMove, false);
-
-// On mouse click, call the given function
-document.addEventListener("click", spawnAtCursor);
-
-function spawnAtCursor(event) {
-  var spawnedCube = pointerCube.clone();
-  scene.add(spawnedCube);
+// Add OrbitControls so that we can pan around with the mouse.
+function createControls() {
+  let controls = new OrbitControls(camera, renderer.domElement);
 }
 
-function updateMousePosition(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+// Create a light, set its position, and add it to the scene.
+function createLight() {
+  const color = 0xffffff;
+  const intensity = 0.75;
+  const dLight = new THREE.DirectionalLight(color, intensity);
+  dLight.position.set(0, 10, 5);
+  dLight.target.position.set(-5, 0, 0);
+  scene.add(dLight);
+  scene.add(dLight.target);
 
-  // Make the sphere follow the mouse
-  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-  vector.unproject(camera);
-  var dir = vector.sub(camera.position).normalize();
-  var distance = -camera.position.z / dir.z;
-  var pos = camera.position.clone().add(dir.multiplyScalar(distance));
+  const intensityHem = 0.55;
+  const skyColor = 0xb1e1ff;
+  const groundColor = 0xb97a20;
+  const hemLight = new THREE.HemisphereLight(
+    skyColor,
+    groundColor,
+    intensityHem
+  );
 
-  return pos;
+  scene.add(dLight);
+  scene.add(hemLight);
 }
 
-// Follows the mouse event
-function onMouseMove(event) {
-  // Update the mouse variable
+function createGround() {
+  // const loader = new THREE.TextureLoader();
+  // const texture = loader.load("jotunheimen_tex.jpg");
 
-  event.preventDefault();
+  var terrainLoader = new THREE.TerrainLoader();
+  terrainLoader.load("textures/jotunheimen.bin", function(data) {
+    const ground = new THREE.PlaneGeometry(60, 60, 199, 199);
 
-  var pos = updateMousePosition(event);
+    for (var i = 0, l = ground.vertices.length; i < l; i++) {
+      ground.vertices[i].z = (data[i] / 65535) * 5;
+    }
 
-  pointerCube.position.copy(pos);
+    scene.add(new THREE.AmbientLight(0xeeeeee));
 
-  pointLight.position.copy(pos);
+    var groundMat = new THREE.MeshPhongMaterial({
+      map: THREE.ImageUtils.loadTexture("textures/jotunheimen_tex.jpg"),
+      //color: 0x000000,
+      wireframe: false
+    });
+
+    var plane = new THREE.Mesh(ground, groundMat);
+    scene.add(plane);
+  });
 }
 
-// Animate
-// ========
+function main() {
+  init();
+  createControls();
+  createGround();
 
-var animate = function() {
-  requestAnimationFrame(animate);
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
 
-  // Animate cube
-  pointerCube.rotation.x += 0.01;
-  pointerCube.rotation.y += 0.01;
+  function render(time) {
+    time *= 0.001; // convert to seconds
 
-  // Animate cube2
-  centerCube.rotation.x -= 0.01;
-  centerCube.rotation.y -= 0.01;
+    resizeRendererToDisplaySize(renderer);
 
-  renderer.render(scene, camera);
-};
+    renderer.render(scene, camera);
 
-animate();
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
