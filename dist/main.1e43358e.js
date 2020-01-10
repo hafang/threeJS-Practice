@@ -35289,58 +35289,7 @@ if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
   /* eslint-enable no-undef */
 
 }
-},{}],"src/TerrainLoader.js":[function(require,module,exports) {
-"use strict";
-
-var THREE = _interopRequireWildcard(require("three"));
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-/**
- * @author Bjorn Sandvik / http://thematicmapping.org/
- */
-THREE.TerrainLoader = function (manager) {
-  this.manager = manager !== undefined ? manager : THREE.DefaultLoadingManager;
-};
-
-THREE.TerrainLoader.prototype = {
-  constructor: THREE.TerrainLoader,
-  load: function load(url, onLoad, onProgress, onError) {
-    var scope = this;
-    var request = new XMLHttpRequest();
-
-    if (onLoad !== undefined) {
-      request.addEventListener("load", function (event) {
-        onLoad(new Uint16Array(event.target.response));
-        scope.manager.itemEnd(url);
-      }, false);
-    }
-
-    if (onProgress !== undefined) {
-      request.addEventListener("progress", function (event) {
-        onProgress(event);
-      }, false);
-    }
-
-    if (onError !== undefined) {
-      request.addEventListener("error", function (event) {
-        onError(event);
-      }, false);
-    }
-
-    if (this.crossOrigin !== undefined) request.crossOrigin = this.crossOrigin;
-    request.open("GET", url, true);
-    request.responseType = "arraybuffer";
-    request.send(null);
-    scope.manager.itemStart(url);
-  },
-  setCrossOrigin: function setCrossOrigin(value) {
-    this.crossOrigin = value;
-  }
-};
-},{"three":"node_modules/three/build/three.module.js"}],"node_modules/three/examples/jsm/controls/OrbitControls.js":[function(require,module,exports) {
+},{}],"node_modules/three/examples/jsm/controls/OrbitControls.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36152,11 +36101,7 @@ MapControls.prototype.constructor = MapControls;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _TerrainLoader = _interopRequireDefault(require("./TerrainLoader"));
-
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -36173,19 +36118,28 @@ function init() {
 
   var fov = 45;
   var nearClip = 0.01;
-  var farClip = 1000;
+  var farClip = 3000;
   camera = new THREE.PerspectiveCamera(fov, width / height, nearClip, farClip);
-  camera.position.z = 1.5; // Create a renderer and add it to the DOM.
+  camera.position.x = 5.5;
+  camera.position.z = 5.5; // Create a renderer and add it to the DOM.
 
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize(width, height);
-  document.body.appendChild(renderer.domElement); // Create an event listener that resizes the renderer with the browser window.
-
-  window.addEventListener("resize", function () {
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+  var canvas = document.querySelector("#c");
+  renderer = new THREE.WebGLRenderer({
+    canvas: canvas
   });
+}
+
+function resizeRendererToDisplaySize(renderer) {
+  var canvas = renderer.domElement;
+  var width = canvas.clientWidth;
+  var height = canvas.clientHeight;
+  var needResize = canvas.width !== width || canvas.height !== height;
+
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+
+  return needResize;
 } // Add OrbitControls so that we can pan around with the mouse.
 
 
@@ -36212,64 +36166,200 @@ function createSpace() {
   scene.add(galaxy);
 }
 
+function createSun() {
+  // Sun
+  var sun_tex = new THREE.TextureLoader().load("textures/sun_tex.jpg");
+  var sunSphere = new THREE.SphereGeometry(0.85, 64, 64);
+  var sunMat = new THREE.MeshPhongMaterial({
+    map: sun_tex,
+    bumpMap: sun_tex,
+    bumpScale: 0.0015
+  });
+  var sun = new THREE.Mesh(sunSphere, sunMat);
+  scene.add(sun);
+  return sun;
+}
+
+function createMercury() {
+  // Mercury
+  var mercury_tex = new THREE.TextureLoader().load("textures/mercury_tex.jpg");
+  var mercurySphere = new THREE.SphereGeometry(0.025, 64, 64);
+  var mercuryMat = new THREE.MeshPhongMaterial({
+    map: mercury_tex,
+    bumpMap: mercury_tex,
+    bumpScale: 0.0015
+  });
+  var mercury = new THREE.Mesh(mercurySphere, mercuryMat);
+  scene.add(mercury);
+  return mercury;
+}
+
+function createVenus() {
+  // Venus
+  var venus_tex = new THREE.TextureLoader().load("textures/venus_tex.jpg");
+  var venusSphere = new THREE.SphereGeometry(0.05, 64, 64);
+  var venusMat = new THREE.MeshPhongMaterial({
+    map: venus_tex,
+    bumpMap: venus_tex,
+    bumpScale: 0.0015
+  });
+  var venus = new THREE.Mesh(venusSphere, venusMat);
+  scene.add(venus);
+  return venus;
+}
+
+function createVenusAtmos() {
+  var venus_atmos = new THREE.TextureLoader().load("textures/venus_atmos.png");
+  var venusAtmosSphere = new THREE.SphereGeometry(0.0505, 64, 64);
+  var venusAtmosMat = new THREE.MeshPhongMaterial({
+    map: venus_atmos,
+    transparent: true
+  });
+  var venusAtmos = new THREE.Mesh(venusAtmosSphere, venusAtmosMat);
+  scene.add(venusAtmos);
+  return venusAtmos;
+}
+
 function createEarth() {
   // Earth
   var earth_noClouds = new THREE.TextureLoader().load("textures/earth_noClouds_4k.jpg");
-  var earthSphere = new THREE.SphereGeometry(0.25, 32, 32);
+  var earthSphere = new THREE.SphereGeometry(0.0505, 64, 64);
   var earthMat = new THREE.MeshPhongMaterial({
     map: earth_noClouds,
     bumpMap: earth_noClouds,
     bumpScale: 0.0015
   });
   var earth = new THREE.Mesh(earthSphere, earthMat);
-  scene.add(earth); // Add clouds to earth
+  scene.add(earth);
+  return earth;
+}
 
+function createClouds() {
+  // Add clouds to earth
   var cloud_tex = new THREE.TextureLoader().load("textures/earth_clouds_4k.png");
-  var cloudSphere = new THREE.SphereGeometry(0.2503, 32, 32);
+  var cloudSphere = new THREE.SphereGeometry(0.051, 64, 64);
   var cloudMat = new THREE.MeshPhongMaterial({
     map: cloud_tex,
     transparent: true
   });
   var clouds = new THREE.Mesh(cloudSphere, cloudMat);
   scene.add(clouds);
+  return clouds;
 }
 
 function createMoon() {
   var moon_tex = new THREE.TextureLoader().load("textures/moon_tex.jpg");
-  var moonSphere = new THREE.SphereGeometry(0.075, 32, 32);
+  var moonSphere = new THREE.SphereGeometry(0.015, 32, 32);
   var moonMat = new THREE.MeshPhongMaterial({
     map: moon_tex,
     bumpMap: moon_tex,
-    bumpScale: 0.005
+    bumpScale: 0.0025
   });
   var moon = new THREE.Mesh(moonSphere, moonMat);
-  moon.position.set(0.5, 0, 0.5);
   scene.add(moon);
+  return moon;
+}
+
+function createMars() {
+  // Mars
+  var mars_tex = new THREE.TextureLoader().load("textures/mars_tex.jpg");
+  var marsSphere = new THREE.SphereGeometry(0.25, 64, 64);
+  var marsMat = new THREE.MeshPhongMaterial({
+    map: mars_tex,
+    bumpMap: mars_tex,
+    bumpScale: 0.0015
+  });
+  var mars = new THREE.Mesh(marsSphere, marsMat);
+  scene.add(mars);
+  return mars;
 }
 
 function main() {
   init();
-  createControls(); //createGround();
-
+  createControls();
   createSpace();
-  createEarth();
-  createMoon();
+  var sun = createSun();
+  var mercury = createMercury();
+  var venus = createVenus();
+  var venusAtmos = createVenusAtmos();
+  var earth = createEarth();
+  var clouds = createClouds();
+  var moon = createMoon();
+  var mars = createMars();
+  createLight(); //Set the sphere's orbital radius, start angle, and angle increment value
 
-  function resizeRendererToDisplaySize(renderer) {
-    var canvas = renderer.domElement;
-    var width = canvas.clientWidth;
-    var height = canvas.clientHeight;
-    var needResize = canvas.width !== width || canvas.height !== height;
-
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-
-    return needResize;
+  {
+    var mercuryR = 2;
+    var mercuryTheta = 0;
+    var mercury_dTheta = 2 * Math.PI / 6736;
+    var venusR = 2.5;
+    var venusTheta = 0;
+    var venus_dTheta = 2 * Math.PI / 11360;
+    var earthR = 3.5;
+    var earthTheta = 0;
+    var earth_dTheta = 2 * Math.PI / 20100;
+    var moonR = 0.1;
+    var moonTheta = 0;
+    var moon_dTheta = 2 * Math.PI / 700;
+    var marsR = 0.05;
+    var marsTheta = 0;
+    var mars_dTheta = 2 * Math.PI / 10000;
   }
 
-  function render(time) {
-    resizeRendererToDisplaySize(renderer);
+  function render() {
+    // Updating the rotation of each planet/star
+    {
+      sun.rotation.y += 0.00025;
+      mercury.rotation.y += 0.0005;
+      venus.rotation.y += 0.0005;
+      earth.rotation.y += 0.0005;
+      clouds.rotation.y += 0.0005;
+      moon.rotation.y += 0.0025;
+      mars.rotation.y += 0.0005;
+    } //Increment theta, and update x and y
+    //position based off new theta value
+
+    {
+      mercuryTheta += mercury_dTheta;
+      mercury.position.x = sun.position.x + mercuryR * Math.cos(mercuryTheta);
+      mercury.position.y = sun.position.y + mercuryR * Math.cos(mercuryTheta) / 5;
+      mercury.position.z = sun.position.z + mercuryR * Math.sin(mercuryTheta);
+    }
+    {
+      venusTheta += venus_dTheta;
+      venus.position.x = sun.position.x + venusR * Math.cos(venusTheta);
+      venus.position.y = sun.position.y + venusR * Math.cos(venusTheta) / 5;
+      venus.position.z = sun.position.z + venusR * Math.sin(venusTheta);
+      venusAtmos.position.x = sun.position.x + venusR * Math.cos(venusTheta);
+      venusAtmos.position.y = sun.position.y + venusR * Math.cos(venusTheta) / 5;
+      venusAtmos.position.z = sun.position.z + venusR * Math.sin(venusTheta);
+    }
+    {
+      earthTheta += earth_dTheta;
+      earth.position.x = sun.position.x + earthR * Math.cos(earthTheta);
+      earth.position.y = sun.position.y + earthR * Math.cos(earthTheta) / 5;
+      earth.position.z = sun.position.z + earthR * Math.sin(earthTheta);
+      clouds.position.x = sun.position.x + earthR * Math.cos(earthTheta);
+      clouds.position.y = sun.position.y + earthR * Math.cos(earthTheta) / 5;
+      clouds.position.z = sun.position.z + earthR * Math.sin(earthTheta);
+      moonTheta += moon_dTheta;
+      moon.position.x = earth.position.x + moonR * Math.cos(moonTheta);
+      moon.position.y = earth.position.y + moonR * Math.cos(moonTheta) / 5;
+      moon.position.z = earth.position.z + moonR * Math.sin(moonTheta);
+    }
+    {
+      marsTheta += mars_dTheta;
+      mars.position.x = sun.position.x + marsR * Math.cos(marsTheta);
+      mars.position.y = sun.position.y + marsR * Math.cos(marsTheta) / 5;
+      mars.position.z = sun.position.z + marsR * Math.sin(marsTheta);
+    }
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      var canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
     renderer.render(scene, camera);
     requestAnimationFrame(render);
   }
@@ -36278,8 +36368,7 @@ function main() {
 }
 
 main();
-createLight();
-},{"three":"node_modules/three/build/three.module.js","./TerrainLoader":"src/TerrainLoader.js","three/examples/jsm/controls/OrbitControls":"node_modules/three/examples/jsm/controls/OrbitControls.js"}],"../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls":"node_modules/three/examples/jsm/controls/OrbitControls.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -36307,7 +36396,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53177" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55138" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -36483,5 +36572,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/main.js"], null)
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/main.js"], null)
 //# sourceMappingURL=/main.1e43358e.js.map
