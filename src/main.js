@@ -222,7 +222,7 @@ function createJupiter() {
   const jupiterMat = new THREE.MeshPhongMaterial({
     map: jupiter_tex,
     bumpMap: jupiter_tex,
-    bumpScale: 0.005
+    bumpScale: 0.0025
   });
 
   var jupiter = new THREE.Mesh(jupiterSphere, jupiterMat);
@@ -236,7 +236,7 @@ function createSaturn() {
   // Saturn
   const saturn_tex = new THREE.TextureLoader().load("textures/saturn_tex.jpg");
 
-  const saturnSphere = new THREE.SphereGeometry(0.125, 64, 64);
+  const saturnSphere = new THREE.SphereGeometry(0.1, 64, 64);
   const saturnMat = new THREE.MeshPhongMaterial({
     map: saturn_tex,
     bumpMap: saturn_tex,
@@ -244,10 +244,32 @@ function createSaturn() {
   });
 
   var saturn = new THREE.Mesh(saturnSphere, saturnMat);
+  saturn.rotation.x = 12.25;
 
   scene.add(saturn);
 
   return saturn;
+}
+
+function createRing() {
+  // Ring
+  const ring_tex = new THREE.TextureLoader().load("textures/saturn_ring.jpg");
+
+  const ringTorus = new THREE.TorusGeometry(0.175, 0.025, 64, 64);
+  const ringMat = new THREE.MeshPhongMaterial({
+    map: ring_tex,
+    bumpMap: ring_tex,
+    bumpScale: 0.005
+  });
+
+  var ring = new THREE.Mesh(ringTorus, ringMat);
+  ring.rotation.x = 130;
+  ring.scale.set(1, 1, 0.25);
+  //   ring.position.set(5, 0, 0);
+
+  scene.add(ring);
+
+  return ring;
 }
 
 function createUranus() {
@@ -304,6 +326,7 @@ function main() {
   const mars = createMars();
   const jupiter = createJupiter();
   const saturn = createSaturn();
+  const ring = createRing();
   const uranus = createUranus();
   const neptune = createNeptune();
 
@@ -339,6 +362,10 @@ function main() {
     var saturnTheta = 0;
     var saturn_dTheta = (2 * Math.PI) / 105850;
 
+    var ringR = 5;
+    var ringTheta = 0;
+    var ring_dTheta = (2 * Math.PI) / 105850;
+
     var uranusR = 5.5;
     var uranusTheta = 0;
     var uranus_dTheta = (2 * Math.PI) / 306600;
@@ -358,10 +385,10 @@ function main() {
       clouds.rotation.y += 0.0005;
       moon.rotation.y += 0.0025;
       mars.rotation.y += 0.0005;
-      jupiter.rotation.y += 0.0005;
-      saturn.rotation.y += 0.0005;
-      uranus.rotation.y += 0.0005;
-      neptune.rotation.y += 0.0005;
+      jupiter.rotation.y += 0.0015;
+      saturn.rotation.y += 0.0015;
+      uranus.rotation.y += 0.0015;
+      neptune.rotation.y += 0.001;
     }
 
     //Increment theta, and update x and y
@@ -421,6 +448,10 @@ function main() {
       saturn.position.y =
         sun.position.y + (saturnR * Math.cos(saturnTheta)) / 5;
       saturn.position.z = sun.position.z + saturnR * Math.sin(saturnTheta);
+      ringTheta += ring_dTheta;
+      ring.position.x = sun.position.x + ringR * Math.cos(ringTheta);
+      ring.position.y = sun.position.y + (ringR * Math.cos(ringTheta)) / 5;
+      ring.position.z = sun.position.z + ringR * Math.sin(ringTheta);
     }
 
     {
