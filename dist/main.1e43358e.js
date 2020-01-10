@@ -36154,6 +36154,14 @@ function createLight() {
   scene.add(dLight2);
 }
 
+function vertexShader() {
+  return "\n  varying vec3 vUv; \n\n  void main() {\n    vUv = position; \n\n    vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);\n    gl_Position = projectionMatrix * modelViewPosition; \n  }\n  ";
+}
+
+function fragmentShader() {
+  return "\n  uniform vec3 colorA; \n  varying vec3 vUv;\n\n  void main() {\n    gl_FragColor = vec4(colorA, 1.0);\n  }\n";
+}
+
 function createSpace() {
   var starfield_tex = new THREE.TextureLoader().load("textures/galaxy_starfield.png");
   var galaxySphere = new THREE.SphereGeometry(90, 64, 64);
@@ -36173,6 +36181,17 @@ function createSun() {
     map: sun_tex,
     bumpMap: sun_tex,
     bumpScale: 0.015
+  });
+  var uniforms = {
+    colorA: {
+      type: "vec3",
+      value: new THREE.Color(0xff7700)
+    }
+  };
+  var shaderMat = new THREE.ShaderMaterial({
+    uniforms: uniforms,
+    fragmentShader: fragmentShader(),
+    vertexShader: vertexShader()
   });
   var sun = new THREE.Mesh(sunSphere, sunMat);
   scene.add(sun);
