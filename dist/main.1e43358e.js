@@ -36120,8 +36120,7 @@ function init() {
   var nearClip = 0.01;
   var farClip = 3000;
   camera = new THREE.PerspectiveCamera(fov, width / height, nearClip, farClip);
-  camera.position.x = 5.5;
-  camera.position.z = 5.5; // Create a renderer and add it to the DOM.
+  camera.position.z = 20; // Create a renderer and add it to the DOM.
 
   var canvas = document.querySelector("#c");
   renderer = new THREE.WebGLRenderer({
@@ -36173,7 +36172,7 @@ function createSun() {
   var sunMat = new THREE.MeshPhongMaterial({
     map: sun_tex,
     bumpMap: sun_tex,
-    bumpScale: 0.0015
+    bumpScale: 0.015
   });
   var sun = new THREE.Mesh(sunSphere, sunMat);
   scene.add(sun);
@@ -36183,7 +36182,7 @@ function createSun() {
 function createMercury() {
   // Mercury
   var mercury_tex = new THREE.TextureLoader().load("textures/mercury_tex.jpg");
-  var mercurySphere = new THREE.SphereGeometry(0.025, 64, 64);
+  var mercurySphere = new THREE.SphereGeometry(0.025, 32, 32);
   var mercuryMat = new THREE.MeshPhongMaterial({
     map: mercury_tex,
     bumpMap: mercury_tex,
@@ -36197,7 +36196,7 @@ function createMercury() {
 function createVenus() {
   // Venus
   var venus_tex = new THREE.TextureLoader().load("textures/venus_tex.jpg");
-  var venusSphere = new THREE.SphereGeometry(0.05, 64, 64);
+  var venusSphere = new THREE.SphereGeometry(0.05, 32, 32);
   var venusMat = new THREE.MeshPhongMaterial({
     map: venus_tex,
     bumpMap: venus_tex,
@@ -36210,7 +36209,7 @@ function createVenus() {
 
 function createVenusAtmos() {
   var venus_atmos = new THREE.TextureLoader().load("textures/venus_atmos.png");
-  var venusAtmosSphere = new THREE.SphereGeometry(0.0505, 64, 64);
+  var venusAtmosSphere = new THREE.SphereGeometry(0.0505, 32, 32);
   var venusAtmosMat = new THREE.MeshPhongMaterial({
     map: venus_atmos,
     transparent: true
@@ -36223,7 +36222,7 @@ function createVenusAtmos() {
 function createEarth() {
   // Earth
   var earth_noClouds = new THREE.TextureLoader().load("textures/earth_noClouds_4k.jpg");
-  var earthSphere = new THREE.SphereGeometry(0.0505, 64, 64);
+  var earthSphere = new THREE.SphereGeometry(0.04505, 32, 32);
   var earthMat = new THREE.MeshPhongMaterial({
     map: earth_noClouds,
     bumpMap: earth_noClouds,
@@ -36237,7 +36236,7 @@ function createEarth() {
 function createClouds() {
   // Add clouds to earth
   var cloud_tex = new THREE.TextureLoader().load("textures/earth_clouds_4k.png");
-  var cloudSphere = new THREE.SphereGeometry(0.051, 64, 64);
+  var cloudSphere = new THREE.SphereGeometry(0.0451, 32, 32);
   var cloudMat = new THREE.MeshPhongMaterial({
     map: cloud_tex,
     transparent: true
@@ -36263,7 +36262,7 @@ function createMoon() {
 function createMars() {
   // Mars
   var mars_tex = new THREE.TextureLoader().load("textures/mars_tex.jpg");
-  var marsSphere = new THREE.SphereGeometry(0.25, 64, 64);
+  var marsSphere = new THREE.SphereGeometry(0.035, 32, 32);
   var marsMat = new THREE.MeshPhongMaterial({
     map: mars_tex,
     bumpMap: mars_tex,
@@ -36272,6 +36271,62 @@ function createMars() {
   var mars = new THREE.Mesh(marsSphere, marsMat);
   scene.add(mars);
   return mars;
+}
+
+function createJupiter() {
+  // Jupiter
+  var jupiter_tex = new THREE.TextureLoader().load("textures/jupiter_tex.jpg");
+  var jupiterSphere = new THREE.SphereGeometry(0.15, 64, 64);
+  var jupiterMat = new THREE.MeshPhongMaterial({
+    map: jupiter_tex,
+    bumpMap: jupiter_tex,
+    bumpScale: 0.005
+  });
+  var jupiter = new THREE.Mesh(jupiterSphere, jupiterMat);
+  scene.add(jupiter);
+  return jupiter;
+}
+
+function createSaturn() {
+  // Saturn
+  var saturn_tex = new THREE.TextureLoader().load("textures/saturn_tex.jpg");
+  var saturnSphere = new THREE.SphereGeometry(0.125, 64, 64);
+  var saturnMat = new THREE.MeshPhongMaterial({
+    map: saturn_tex,
+    bumpMap: saturn_tex,
+    bumpScale: 0.005
+  });
+  var saturn = new THREE.Mesh(saturnSphere, saturnMat);
+  scene.add(saturn);
+  return saturn;
+}
+
+function createUranus() {
+  // Uranus
+  var uranus_tex = new THREE.TextureLoader().load("textures/uranus_tex.jpg");
+  var uranusSphere = new THREE.SphereGeometry(0.055, 64, 64);
+  var uranusMat = new THREE.MeshPhongMaterial({
+    map: uranus_tex,
+    bumpMap: uranus_tex,
+    bumpScale: 0.005
+  });
+  var uranus = new THREE.Mesh(uranusSphere, uranusMat);
+  scene.add(uranus);
+  return uranus;
+}
+
+function createNeptune() {
+  // Neptune
+  var neptune_tex = new THREE.TextureLoader().load("textures/neptune_tex.jpg");
+  var neptuneSphere = new THREE.SphereGeometry(0.055, 64, 64);
+  var neptuneMat = new THREE.MeshPhongMaterial({
+    map: neptune_tex,
+    bumpMap: neptune_tex,
+    bumpScale: 0.005
+  });
+  var neptune = new THREE.Mesh(neptuneSphere, neptuneMat);
+  scene.add(neptune);
+  return neptune;
 }
 
 function main() {
@@ -36286,36 +36341,56 @@ function main() {
   var clouds = createClouds();
   var moon = createMoon();
   var mars = createMars();
+  var jupiter = createJupiter();
+  var saturn = createSaturn();
+  var uranus = createUranus();
+  var neptune = createNeptune();
   createLight(); //Set the sphere's orbital radius, start angle, and angle increment value
 
   {
     var mercuryR = 2;
     var mercuryTheta = 0;
-    var mercury_dTheta = 2 * Math.PI / 6736;
-    var venusR = 2.5;
+    var mercury_dTheta = 2 * Math.PI / 880;
+    var venusR = 2.375;
     var venusTheta = 0;
-    var venus_dTheta = 2 * Math.PI / 11360;
-    var earthR = 3.5;
+    var venus_dTheta = 2 * Math.PI / 2250;
+    var earthR = 2.75;
     var earthTheta = 0;
-    var earth_dTheta = 2 * Math.PI / 20100;
+    var earth_dTheta = 2 * Math.PI / 3650;
     var moonR = 0.1;
     var moonTheta = 0;
-    var moon_dTheta = 2 * Math.PI / 700;
-    var marsR = 0.05;
+    var moon_dTheta = 2 * Math.PI / 270;
+    var marsR = 3;
     var marsTheta = 0;
-    var mars_dTheta = 2 * Math.PI / 10000;
+    var mars_dTheta = 2 * Math.PI / 6870;
+    var jupiterR = 4.25;
+    var jupiterTheta = 0;
+    var jupiter_dTheta = 2 * Math.PI / 43800;
+    var saturnR = 5;
+    var saturnTheta = 0;
+    var saturn_dTheta = 2 * Math.PI / 105850;
+    var uranusR = 5.5;
+    var uranusTheta = 0;
+    var uranus_dTheta = 2 * Math.PI / 306600;
+    var neptuneR = 5.8;
+    var neptuneTheta = 0;
+    var neptune_dTheta = 2 * Math.PI / 602250;
   }
 
   function render() {
     // Updating the rotation of each planet/star
     {
-      sun.rotation.y += 0.00025;
+      sun.rotation.y += 0.0025;
       mercury.rotation.y += 0.0005;
       venus.rotation.y += 0.0005;
       earth.rotation.y += 0.0005;
       clouds.rotation.y += 0.0005;
       moon.rotation.y += 0.0025;
       mars.rotation.y += 0.0005;
+      jupiter.rotation.y += 0.0005;
+      saturn.rotation.y += 0.0005;
+      uranus.rotation.y += 0.0005;
+      neptune.rotation.y += 0.0005;
     } //Increment theta, and update x and y
     //position based off new theta value
 
@@ -36352,6 +36427,30 @@ function main() {
       mars.position.x = sun.position.x + marsR * Math.cos(marsTheta);
       mars.position.y = sun.position.y + marsR * Math.cos(marsTheta) / 5;
       mars.position.z = sun.position.z + marsR * Math.sin(marsTheta);
+    }
+    {
+      jupiterTheta += jupiter_dTheta;
+      jupiter.position.x = sun.position.x + jupiterR * Math.cos(jupiterTheta);
+      jupiter.position.y = sun.position.y + jupiterR * Math.cos(jupiterTheta) / 5;
+      jupiter.position.z = sun.position.z + jupiterR * Math.sin(jupiterTheta);
+    }
+    {
+      saturnTheta += saturn_dTheta;
+      saturn.position.x = sun.position.x + saturnR * Math.cos(saturnTheta);
+      saturn.position.y = sun.position.y + saturnR * Math.cos(saturnTheta) / 5;
+      saturn.position.z = sun.position.z + saturnR * Math.sin(saturnTheta);
+    }
+    {
+      uranusTheta += uranus_dTheta;
+      uranus.position.x = sun.position.x + uranusR * Math.cos(uranusTheta);
+      uranus.position.y = sun.position.y + uranusR * Math.cos(uranusTheta) / 5;
+      uranus.position.z = sun.position.z + uranusR * Math.sin(uranusTheta);
+    }
+    {
+      neptuneTheta += neptune_dTheta;
+      neptune.position.x = sun.position.x + neptuneR * Math.cos(neptuneTheta);
+      neptune.position.y = sun.position.y + neptuneR * Math.cos(neptuneTheta) / 5;
+      neptune.position.z = sun.position.z + neptuneR * Math.sin(neptuneTheta);
     }
 
     if (resizeRendererToDisplaySize(renderer)) {
