@@ -36148,10 +36148,23 @@ function createControls() {
 
 
 function createLight() {
-  scene.add(new THREE.AmbientLight(0x333333));
-  var dLight2 = new THREE.DirectionalLight(0xffffff, 1);
-  dLight2.position.set(5, 3, 5);
-  scene.add(dLight2);
+  //   scene.add(new THREE.AmbientLight(0x333333));
+  //   const dLight2 = new THREE.DirectionalLight(0xffffff, 1);
+  //   dLight2.position.set(5, 3, 5);
+  //   scene.add(dLight2);
+  var color = 0xffffff;
+  var intensity = 0.75;
+  var dLight = new THREE.DirectionalLight(color, intensity);
+  dLight.position.set(0, 10, 5);
+  dLight.target.position.set(-5, 0, 0);
+  scene.add(dLight);
+  scene.add(dLight.target);
+  var intensityHem = 0.55;
+  var skyColor = 0xb1e1ff;
+  var groundColor = 0xb97a20;
+  var hemLight = new THREE.HemisphereLight(skyColor, groundColor, intensityHem);
+  scene.add(dLight);
+  scene.add(hemLight);
 }
 
 function vertexShader() {
@@ -36382,8 +36395,8 @@ function main() {
   var saturn = createSaturn();
   var ring = createRing();
   var uranus = createUranus();
-  var neptune = createNeptune();
-  createLight(); //Set the sphere's orbital radius, start angle, and angle increment value
+  var neptune = createNeptune(); //createLight();
+  //Set the sphere's orbital radius, start angle, and angle increment value
 
   {
     var mercuryR = 2;
@@ -36512,6 +36525,7 @@ function main() {
 }
 
 main();
+createLight();
 },{"three":"node_modules/three/build/three.module.js","three/examples/jsm/controls/OrbitControls":"node_modules/three/examples/jsm/controls/OrbitControls.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

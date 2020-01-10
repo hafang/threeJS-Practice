@@ -43,11 +43,31 @@ function createControls() {
 
 // Create a light, set its position, and add it to the scene.
 function createLight() {
-  scene.add(new THREE.AmbientLight(0x333333));
+  //   scene.add(new THREE.AmbientLight(0x333333));
 
-  const dLight2 = new THREE.DirectionalLight(0xffffff, 1);
-  dLight2.position.set(5, 3, 5);
-  scene.add(dLight2);
+  //   const dLight2 = new THREE.DirectionalLight(0xffffff, 1);
+  //   dLight2.position.set(5, 3, 5);
+  //   scene.add(dLight2);
+
+  const color = 0xffffff;
+  const intensity = 0.75;
+  const dLight = new THREE.DirectionalLight(color, intensity);
+  dLight.position.set(0, 10, 5);
+  dLight.target.position.set(-5, 0, 0);
+  scene.add(dLight);
+  scene.add(dLight.target);
+
+  const intensityHem = 0.55;
+  const skyColor = 0xb1e1ff;
+  const groundColor = 0xb97a20;
+  const hemLight = new THREE.HemisphereLight(
+    skyColor,
+    groundColor,
+    intensityHem
+  );
+
+  scene.add(dLight);
+  scene.add(hemLight);
 }
 
 function vertexShader() {
@@ -364,7 +384,7 @@ function main() {
   const uranus = createUranus();
   const neptune = createNeptune();
 
-  createLight();
+  //createLight();
 
   //Set the sphere's orbital radius, start angle, and angle increment value
   {
@@ -517,3 +537,4 @@ function main() {
 }
 
 main();
+createLight();
