@@ -13,6 +13,7 @@
     "three": "^0.112.1"
   },
   "devDependencies": {
+    "bootstrap": "^4.4.1",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-static-files-copy": "^2.2.1"
   },
