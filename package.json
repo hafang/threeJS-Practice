@@ -10,7 +10,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "three": "^0.112.1"
+    "three": "^0.125.0"
   },
   "devDependencies": {
     "bootstrap": "^4.4.1",
